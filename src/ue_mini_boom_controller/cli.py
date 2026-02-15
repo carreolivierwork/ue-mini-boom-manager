@@ -101,6 +101,9 @@ Examples:
 
   # Interactive mode
   %(prog)s -i
+
+Tab completion (add to ~/.bashrc or ~/.zshrc):
+  eval "$(register-python-argcomplete %(prog)s)"
         """,
     )
 
