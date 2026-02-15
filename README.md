@@ -163,4 +163,4 @@ Packet format: `[total_length] [0x01] [command_id] [params...]`
 
 ## License
 
-MIT — For personal use with your own UE Mini Boom hardware.
+[GPL-3.0](LICENSE)
