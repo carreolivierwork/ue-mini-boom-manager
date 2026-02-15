@@ -26,9 +26,7 @@ class TestCLIHelp:
 
     def test_no_args_prints_help(self, capsys):
         with patch.object(sys, "argv", ["ueboom"]):
-            with patch(
-                "ue_mini_boom_controller.cli.get_paired_ue_devices", return_value=[]
-            ):
+            with patch("ue_mini_boom_controller.cli.get_paired_ue_devices", return_value=[]):
                 main()
         captured = capsys.readouterr()
         assert "--mac" in captured.out
@@ -42,9 +40,7 @@ class TestCLIAutoDetect:
                 "ue_mini_boom_controller.cli.get_paired_ue_devices",
                 return_value=[("88:C6:26:AA:BB:CC", "SpeakerRight")],
             ):
-                with patch(
-                    "ue_mini_boom_controller.cli.get_battery", return_value=75
-                ):
+                with patch("ue_mini_boom_controller.cli.get_battery", return_value=75):
                     main()
         captured = capsys.readouterr()
         assert "Auto-detected: SpeakerRight (88:C6:26:AA:BB:CC)" in captured.out
@@ -69,9 +65,7 @@ class TestCLIAutoDetect:
     def test_auto_detect_no_devices(self, capsys):
         """No paired UE devices should print help."""
         with patch.object(sys, "argv", ["ueboom", "--battery"]):
-            with patch(
-                "ue_mini_boom_controller.cli.get_paired_ue_devices", return_value=[]
-            ):
+            with patch("ue_mini_boom_controller.cli.get_paired_ue_devices", return_value=[]):
                 main()
         captured = capsys.readouterr()
         assert "--mac" in captured.out
@@ -97,9 +91,7 @@ class TestCLIList:
     def test_list_no_devices(self, capsys):
         """--list with no paired UE speakers should show pairing instructions."""
         with patch.object(sys, "argv", ["ueboom", "--list"]):
-            with patch(
-                "ue_mini_boom_controller.cli.get_paired_ue_devices", return_value=[]
-            ):
+            with patch("ue_mini_boom_controller.cli.get_paired_ue_devices", return_value=[]):
                 main()
         captured = capsys.readouterr()
         assert "No paired UE speakers found" in captured.out
@@ -123,9 +115,7 @@ class TestCLIStereoSetup:
         assert "discovery mode" in captured.out
         assert "Stereo setup complete" in captured.out
         assert mock_spp.call_count == 1
-        mock_spp.assert_any_call(
-            "AA:BB:CC:DD:EE:FF", COMMANDS["stereo_discover"], verbose=False
-        )
+        mock_spp.assert_any_call("AA:BB:CC:DD:EE:FF", COMMANDS["stereo_discover"], verbose=False)
 
     def test_stereo_setup_send_failure(self, capsys):
         """Stereo setup aborts when initial discovery command fails."""

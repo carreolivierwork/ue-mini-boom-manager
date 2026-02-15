@@ -36,10 +36,7 @@ def test_get_device_status_disconnected():
     """Should report connected=False for disconnected device."""
     mock_result = MagicMock()
     mock_result.stdout = (
-        "Device 88:C6:26:20:33:40 (public)\n"
-        "\tName: JoretapoL\n"
-        "\tPaired: yes\n"
-        "\tConnected: no\n"
+        "Device 88:C6:26:20:33:40 (public)\n\tName: JoretapoL\n\tPaired: yes\n\tConnected: no\n"
     )
 
     with patch("ue_mini_boom_controller.ble.subprocess.run", return_value=mock_result):
@@ -51,9 +48,7 @@ def test_get_device_status_disconnected():
 
 def test_get_device_status_bluetoothctl_missing():
     """Should return empty dict when bluetoothctl is not installed."""
-    with patch(
-        "ue_mini_boom_controller.ble.subprocess.run", side_effect=FileNotFoundError
-    ):
+    with patch("ue_mini_boom_controller.ble.subprocess.run", side_effect=FileNotFoundError):
         status = get_device_status("88:C6:26:20:33:40")
 
     assert status == {}
@@ -91,9 +86,7 @@ def test_get_battery_no_battery_interface():
 
 def test_get_battery_dbus_missing():
     """Should return -1 when dbus-send is not installed."""
-    with patch(
-        "ue_mini_boom_controller.ble.subprocess.run", side_effect=FileNotFoundError
-    ):
+    with patch("ue_mini_boom_controller.ble.subprocess.run", side_effect=FileNotFoundError):
         result = get_battery("88:C6:26:20:33:40")
 
     assert result == -1
@@ -151,9 +144,7 @@ def test_get_paired_ue_devices_none_found():
 
 def test_get_paired_ue_devices_bluetoothctl_missing():
     """Should return empty list when bluetoothctl is not installed."""
-    with patch(
-        "ue_mini_boom_controller.ble.subprocess.run", side_effect=FileNotFoundError
-    ):
+    with patch("ue_mini_boom_controller.ble.subprocess.run", side_effect=FileNotFoundError):
         devices = get_paired_ue_devices()
 
     assert devices == []

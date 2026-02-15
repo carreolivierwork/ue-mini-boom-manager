@@ -98,9 +98,7 @@ class TestSendSppPybluezFallback:
         mock_socket = MagicMock()
         mock_socket.recv.return_value = b""
         bt.BluetoothSocket = MagicMock(return_value=mock_socket)
-        bt.find_service.return_value = [
-            {"host": "AA:BB:CC:DD:EE:FF", "port": 1, "name": "LWACP"}
-        ]
+        bt.find_service.return_value = [{"host": "AA:BB:CC:DD:EE:FF", "port": 1, "name": "LWACP"}]
 
         with (
             patch("ue_mini_boom_controller.spp.socket") as mock_socket_mod,

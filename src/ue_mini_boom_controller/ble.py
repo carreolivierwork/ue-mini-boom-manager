@@ -56,10 +56,14 @@ def get_battery(speaker_mac: str) -> int:
     try:
         result = subprocess.run(
             [
-                "dbus-send", "--system", "--print-reply",
-                "--dest=org.bluez", dbus_path,
+                "dbus-send",
+                "--system",
+                "--print-reply",
+                "--dest=org.bluez",
+                dbus_path,
                 "org.freedesktop.DBus.Properties.Get",
-                "string:org.bluez.Battery1", "string:Percentage",
+                "string:org.bluez.Battery1",
+                "string:Percentage",
             ],
             capture_output=True,
             text=True,
