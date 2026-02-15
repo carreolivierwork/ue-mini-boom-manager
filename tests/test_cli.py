@@ -117,19 +117,14 @@ class TestCLIStereoSetup:
                 "ue_mini_boom_controller.cli.send_spp_command", return_value=True
             ) as mock_spp:
                 with patch("builtins.input", side_effect=["y", ""]):
-                    with patch("ue_mini_boom_controller.cli.time.sleep"):
-                        main()
+                    main()
         captured = capsys.readouterr()
         assert "Stereo Setup" in captured.out
         assert "discovery mode" in captured.out
         assert "Stereo setup complete" in captured.out
-        assert "LEFT" in captured.out
-        assert mock_spp.call_count == 2
+        assert mock_spp.call_count == 1
         mock_spp.assert_any_call(
             "AA:BB:CC:DD:EE:FF", COMMANDS["stereo_discover"], verbose=False
-        )
-        mock_spp.assert_any_call(
-            "AA:BB:CC:DD:EE:FF", COMMANDS["role_left"], verbose=False
         )
 
     def test_stereo_setup_send_failure(self, capsys):
@@ -144,19 +139,17 @@ class TestCLIStereoSetup:
         assert "ERROR" in captured.out
         assert mock_spp.call_count == 1
 
-    def test_stereo_setup_role_failure(self, capsys):
-        """Stereo setup aborts when role assignment command fails."""
+    def test_stereo_setup_pairing_timed_out(self, capsys):
+        """User answers 'n' when lights didn't go solid."""
         with patch.object(sys, "argv", _STEREO_SETUP_ARGV):
             with patch(
-                "ue_mini_boom_controller.cli.send_spp_command",
-                side_effect=[True, False],
+                "ue_mini_boom_controller.cli.send_spp_command", return_value=True
             ) as mock_spp:
-                with patch("builtins.input", side_effect=["y", ""]):
-                    with patch("ue_mini_boom_controller.cli.time.sleep"):
-                        main()
+                with patch("builtins.input", side_effect=["y", "n"]):
+                    main()
         captured = capsys.readouterr()
-        assert "Failed to assign stereo role" in captured.out
-        assert mock_spp.call_count == 2
+        assert "timed out" in captured.out.lower()
+        assert mock_spp.call_count == 1
 
     def test_stereo_setup_keyboard_interrupt(self, capsys):
         """Ctrl+C after stereo sent prints cancellation and discovery warning."""

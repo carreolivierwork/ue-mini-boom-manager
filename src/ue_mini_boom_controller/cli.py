@@ -1,7 +1,6 @@
 """CLI entry point for UE Mini Boom Controller."""
 
 import argparse
-import time
 
 import argcomplete
 
@@ -69,18 +68,12 @@ def _stereo_setup_flow(mac: str):
         print("  3. Wait for it to start blinking fast")
         print("  4. Wait for both speakers to stop blinking (lights go solid)")
         print()
-        print("  Note: If both lights turn off instead of going solid,")
-        print("  the pairing timed out. Re-run --stereo-setup and try again.")
-        print()
-        input("Press Enter when both speakers have solid lights...")
-        print()
-        print("Step 3: Assigning connected speaker as LEFT channel...")
-        time.sleep(1.0)
-        if not send_spp_command(mac, COMMANDS["role_left"], verbose=False):
-            print("ERROR: Failed to assign stereo role.")
+        result = input("Did both lights go solid? [Y/n]: ").strip().lower()
+        if result in ("n", "no"):
+            print("Pairing timed out. Re-run --stereo-setup to try again.")
             return
 
-        print("Stereo setup complete! Connected speaker is LEFT, second speaker is RIGHT.")
+        print("Stereo setup complete!")
 
     except (KeyboardInterrupt, EOFError):
         print("\nSetup cancelled.")

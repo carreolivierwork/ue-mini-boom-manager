@@ -101,7 +101,4 @@ COMMANDS = {
     "sound_power_on": build_spp_command(UECommand.EMIT_SOUND, 0x60, 0xC0),
     # Stereo discovery trigger (querying DU lock initiates pairing workflow)
     "stereo_discover": build_spp_command(UECommand.DOUBLE_UP_LOCK),
-    # Stereo role assignment
-    "role_left": build_spp_command(UECommand.DOUBLE_UP_ROLE, 0x00),
-    "role_right": build_spp_command(UECommand.DOUBLE_UP_ROLE, 0x01),
 }

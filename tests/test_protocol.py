@@ -67,25 +67,17 @@ class TestUECommandConstants:
 
 class TestCommandsDict:
     def test_completeness(self):
-        """COMMANDS dict has all 5 expected keys."""
+        """COMMANDS dict has all 3 expected keys."""
         expected_keys = {
             "battery_announce",
             "sound_power_on",
             "stereo_discover",
-            "role_left",
-            "role_right",
         }
         assert set(COMMANDS.keys()) == expected_keys
 
     def test_all_values_are_bytes(self):
         for key, value in COMMANDS.items():
             assert isinstance(value, bytes), f"COMMANDS['{key}'] is not bytes"
-
-    def test_role_left_value(self):
-        assert COMMANDS["role_left"] == build_spp_command(0x68, 0x00)
-
-    def test_role_right_value(self):
-        assert COMMANDS["role_right"] == build_spp_command(0x68, 0x01)
 
     def test_battery_announce_value(self):
         assert COMMANDS["battery_announce"] == build_spp_command(0x6B)
