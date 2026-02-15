@@ -20,7 +20,6 @@ class TestCLIHelp:
         assert "--mac" in captured.out
         assert "--list" in captured.out
         assert "--battery" in captured.out
-        assert "--eq" in captured.out
         assert "--stereo" in captured.out
         assert "--interactive" in captured.out
         assert "--raw" in captured.out
@@ -33,19 +32,6 @@ class TestCLIHelp:
                 main()
         captured = capsys.readouterr()
         assert "--mac" in captured.out
-
-
-class TestCLIArgumentParsing:
-    def test_mac_required_for_eq(self, capsys):
-        """--eq without --mac should print help when no devices found."""
-        with patch.object(sys, "argv", ["ueboom", "--eq", "outloud"]):
-            with patch(
-                "ue_mini_boom_controller.cli.get_paired_ue_devices", return_value=[]
-            ):
-                main()
-        captured = capsys.readouterr()
-        assert "--mac" in captured.out
-
 
 
 class TestCLIAutoDetect:
@@ -124,44 +110,30 @@ _STEREO_SETUP_ARGV = ["ueboom", "--mac", "AA:BB:CC:DD:EE:FF", "--stereo-setup"]
 
 
 class TestCLIStereoSetup:
-    def test_stereo_setup_happy_path_default_left(self, capsys):
-        """Stereo setup with default left role (Enter at both prompts)."""
+    def test_stereo_setup_happy_path(self, capsys):
+        """Stereo setup assigns connected speaker as left by default."""
         with patch.object(sys, "argv", _STEREO_SETUP_ARGV):
             with patch(
                 "ue_mini_boom_controller.cli.send_spp_command", return_value=True
             ) as mock_spp:
-                with patch("builtins.input", side_effect=["y", "", ""]):
+                with patch("builtins.input", side_effect=["y", ""]):
                     with patch("ue_mini_boom_controller.cli.time.sleep"):
                         main()
         captured = capsys.readouterr()
         assert "Stereo Setup" in captured.out
         assert "discovery mode" in captured.out
         assert "Stereo setup complete" in captured.out
+        assert "LEFT" in captured.out
         assert mock_spp.call_count == 2
         mock_spp.assert_any_call(
-            "AA:BB:CC:DD:EE:FF", COMMANDS["mode_stereo"], verbose=False
+            "AA:BB:CC:DD:EE:FF", COMMANDS["stereo_discover"], verbose=False
         )
         mock_spp.assert_any_call(
             "AA:BB:CC:DD:EE:FF", COMMANDS["role_left"], verbose=False
         )
 
-    def test_stereo_setup_right_channel(self, capsys):
-        """Stereo setup with right channel selected."""
-        with patch.object(sys, "argv", _STEREO_SETUP_ARGV):
-            with patch(
-                "ue_mini_boom_controller.cli.send_spp_command", return_value=True
-            ) as mock_spp:
-                with patch("builtins.input", side_effect=["y", "", "r"]):
-                    with patch("ue_mini_boom_controller.cli.time.sleep"):
-                        main()
-        captured = capsys.readouterr()
-        assert "Stereo setup complete" in captured.out
-        mock_spp.assert_any_call(
-            "AA:BB:CC:DD:EE:FF", COMMANDS["role_right"], verbose=False
-        )
-
     def test_stereo_setup_send_failure(self, capsys):
-        """Stereo setup aborts when initial mode_stereo command fails."""
+        """Stereo setup aborts when initial discovery command fails."""
         with patch.object(sys, "argv", _STEREO_SETUP_ARGV):
             with patch(
                 "ue_mini_boom_controller.cli.send_spp_command", return_value=False
@@ -179,28 +151,12 @@ class TestCLIStereoSetup:
                 "ue_mini_boom_controller.cli.send_spp_command",
                 side_effect=[True, False],
             ) as mock_spp:
-                with patch("builtins.input", side_effect=["y", "", ""]):
+                with patch("builtins.input", side_effect=["y", ""]):
                     with patch("ue_mini_boom_controller.cli.time.sleep"):
                         main()
         captured = capsys.readouterr()
         assert "Failed to assign stereo role" in captured.out
         assert mock_spp.call_count == 2
-
-    def test_stereo_setup_garbage_input_defaults_left(self, capsys):
-        """Unrecognized role input warns and defaults to left channel."""
-        with patch.object(sys, "argv", _STEREO_SETUP_ARGV):
-            with patch(
-                "ue_mini_boom_controller.cli.send_spp_command", return_value=True
-            ) as mock_spp:
-                with patch("builtins.input", side_effect=["y", "", "banana"]):
-                    with patch("ue_mini_boom_controller.cli.time.sleep"):
-                        main()
-        captured = capsys.readouterr()
-        assert "Unrecognized" in captured.out
-        assert "left" in captured.out
-        mock_spp.assert_any_call(
-            "AA:BB:CC:DD:EE:FF", COMMANDS["role_left"], verbose=False
-        )
 
     def test_stereo_setup_keyboard_interrupt(self, capsys):
         """Ctrl+C after stereo sent prints cancellation and discovery warning."""

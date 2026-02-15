@@ -7,58 +7,36 @@ from .spp import send_spp_command, set_speaker_name
 def interactive_mode(mac_address: str):
     """Run an interactive menu for controlling the speaker."""
     print(f"""
-\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557
-\u2551         UE Mini Boom Controller v1.0             \u2551
-\u2551         Speaker: {mac_address}       \u2551
-\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d
-
-=== EQ Presets ===
-  1) EQ: Out Loud (bass boost)
-  2) EQ: Intimate (reduced bass)
-  3) EQ: Vocals (mid boost)
-  4) EQ: Off (flat)
+╔══════════════════════════════════════════════════╗
+║         UE Mini Boom Controller v1.0             ║
+║         Speaker: {mac_address}       ║
+╚══════════════════════════════════════════════════╝
 
 === Stereo / Double Up ===
-  5) Set mode: Stereo (L/R channels)
-  6) Set mode: Double (same audio)
-  7) Set this speaker as LEFT channel
-  8) Set this speaker as RIGHT channel
-  9) Double Up auto-reconnect: ON
- 10) Double Up auto-reconnect: OFF
+  1) Set mode: Stereo (L/R channels)
+  2) Set mode: Double (same audio)
+  3) Set this speaker as LEFT channel
+  4) Set this speaker as RIGHT channel
+  5) Double Up auto-reconnect: ON
+  6) Double Up auto-reconnect: OFF
 
 === Other ===
- 11) Announce battery level (audible)
- 12) Volume up
- 13) Volume down
- 14) Alerts ON
- 15) Alerts OFF
- 16) BLE ON
- 17) BLE OFF
- 18) Set speaker name
- 19) Play power-on sound
+  7) Announce battery level (audible)
+  8) Set speaker name
+  9) Play power-on sound
 
   0) Quit
 """)
 
     command_map = {
-        "1": "eq_outloud",
-        "2": "eq_intimate",
-        "3": "eq_vocals",
-        "4": "eq_off",
-        "5": "mode_stereo",
-        "6": "mode_double",
-        "7": "role_left",
-        "8": "role_right",
-        "9": "doubleup_lock_on",
-        "10": "doubleup_lock_off",
-        "11": "battery_announce",
-        "12": "volume_up",
-        "13": "volume_down",
-        "14": "alerts_on",
-        "15": "alerts_off",
-        "16": "ble_on",
-        "17": "ble_off",
-        "19": "sound_power_on",
+        "1": "mode_stereo",
+        "2": "mode_double",
+        "3": "role_left",
+        "4": "role_right",
+        "5": "doubleup_lock_on",
+        "6": "doubleup_lock_off",
+        "7": "battery_announce",
+        "9": "sound_power_on",
     }
 
     while True:
@@ -71,7 +49,7 @@ def interactive_mode(mac_address: str):
         if choice == "0":
             print("Goodbye!")
             break
-        elif choice == "18":
+        elif choice == "8":
             name = input("Enter new speaker name: ").strip()
             if name:
                 set_speaker_name(mac_address, name)

@@ -141,43 +141,6 @@ def _send_spp_pybluez(mac_address: str, command: bytes, verbose: bool = True):
             sock.close()
 
 
-def query_spp_value(mac_address: str, command_id: int) -> int | None:
-    """Query the current value of a command from the speaker via LWACP.
-
-    Sends a parameterless command and parses the response.
-    Response format: [len] [00] [00] [01] [cmd_id] [value]
-
-    Returns the value byte or None on failure.
-    """
-    if not hasattr(socket, "AF_BLUETOOTH"):
-        return None
-
-    channel = _find_rfcomm_channel(mac_address)
-    if channel is None:
-        channel = _DEFAULT_RFCOMM_CHANNEL
-
-    query = bytes([0x02, 0x01, command_id])
-    sock = None
-    try:
-        sock = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
-        sock.connect((mac_address, channel))
-        time.sleep(0.3)
-        sock.send(query)
-        time.sleep(0.5)
-        sock.settimeout(2.0)
-        resp = sock.recv(1024)
-        # Parse: look for cmd_id in response followed by value byte
-        for i in range(len(resp) - 1):
-            if resp[i] == command_id:
-                return resp[i + 1]
-    except Exception:
-        pass
-    finally:
-        if sock is not None:
-            sock.close()
-    return None
-
-
 def query_spp_values(mac_address: str, command_ids: list[int]) -> dict[int, int | None]:
     """Query multiple LWACP values in a single RFCOMM connection.
 

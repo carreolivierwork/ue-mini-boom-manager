@@ -7,6 +7,8 @@ from unittest.mock import MagicMock, patch
 from ue_mini_boom_controller.protocol import COMMANDS, UECommand, build_spp_command
 from ue_mini_boom_controller.spp import send_spp_command, set_speaker_name
 
+_TEST_CMD = COMMANDS["battery_announce"]
+
 
 def _make_bluetooth_mock():
     """Create a mock bluetooth module with BluetoothSocket, RFCOMM, find_service."""
@@ -40,11 +42,11 @@ class TestSendSppNative:
             mock_socket_mod.BTPROTO_RFCOMM = 3
             mock_socket_mod.socket.return_value = mock_sock
 
-            result = send_spp_command("AA:BB:CC:DD:EE:FF", COMMANDS["eq_outloud"], verbose=False)
+            result = send_spp_command("AA:BB:CC:DD:EE:FF", _TEST_CMD, verbose=False)
 
         assert result is True
         mock_sock.connect.assert_called_once_with(("AA:BB:CC:DD:EE:FF", 5))
-        mock_sock.send.assert_called_once_with(COMMANDS["eq_outloud"])
+        mock_sock.send.assert_called_once_with(_TEST_CMD)
         mock_sock.close.assert_called_once()
 
     def test_connection_error(self):
@@ -63,7 +65,7 @@ class TestSendSppNative:
             mock_socket_mod.BTPROTO_RFCOMM = 3
             mock_socket_mod.socket.return_value = mock_sock
 
-            result = send_spp_command("AA:BB:CC:DD:EE:FF", COMMANDS["eq_outloud"], verbose=False)
+            result = send_spp_command("AA:BB:CC:DD:EE:FF", _TEST_CMD, verbose=False)
 
         assert result is False
 
@@ -82,7 +84,7 @@ class TestSendSppNative:
             mock_socket_mod.BTPROTO_RFCOMM = 3
             mock_socket_mod.socket.return_value = mock_sock
 
-            result = send_spp_command("AA:BB:CC:DD:EE:FF", COMMANDS["eq_outloud"], verbose=False)
+            result = send_spp_command("AA:BB:CC:DD:EE:FF", _TEST_CMD, verbose=False)
 
         assert result is True
         mock_sock.connect.assert_called_once_with(("AA:BB:CC:DD:EE:FF", 5))
@@ -105,11 +107,11 @@ class TestSendSppPybluezFallback:
             patch.dict(sys.modules, {"bluetooth": bt}),
         ):
             del mock_socket_mod.AF_BLUETOOTH  # Force pybluez fallback
-            result = send_spp_command("AA:BB:CC:DD:EE:FF", COMMANDS["eq_outloud"], verbose=False)
+            result = send_spp_command("AA:BB:CC:DD:EE:FF", _TEST_CMD, verbose=False)
 
         assert result is True
         mock_socket.connect.assert_called_once_with(("AA:BB:CC:DD:EE:FF", 1))
-        mock_socket.send.assert_called_once_with(COMMANDS["eq_outloud"])
+        mock_socket.send.assert_called_once_with(_TEST_CMD)
         mock_socket.close.assert_called_once()
 
     def test_no_service(self):
@@ -121,7 +123,7 @@ class TestSendSppPybluezFallback:
             patch.dict(sys.modules, {"bluetooth": bt}),
         ):
             del mock_socket_mod.AF_BLUETOOTH
-            result = send_spp_command("AA:BB:CC:DD:EE:FF", COMMANDS["eq_outloud"], verbose=False)
+            result = send_spp_command("AA:BB:CC:DD:EE:FF", _TEST_CMD, verbose=False)
 
         assert result is False
 
@@ -131,7 +133,7 @@ class TestSendSppPybluezFallback:
             patch.dict(sys.modules, {"bluetooth": None}),
         ):
             del mock_socket_mod.AF_BLUETOOTH
-            result = send_spp_command("AA:BB:CC:DD:EE:FF", COMMANDS["eq_outloud"], verbose=False)
+            result = send_spp_command("AA:BB:CC:DD:EE:FF", _TEST_CMD, verbose=False)
 
         assert result is False
 

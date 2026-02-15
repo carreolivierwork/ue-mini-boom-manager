@@ -11,7 +11,6 @@ from .protocol import COMMANDS, UECommand
 from .spp import query_spp_values, send_spp_command, set_speaker_name
 
 _EQ_NAMES = {0: "Off (flat)", 1: "Out Loud", 2: "Intimate", 3: "Vocals"}
-_ALERT_NAMES = {0: "Off", 1: "On (conga)", 2: "On (default)"}
 
 
 def _print_status(mac: str):
@@ -36,24 +35,12 @@ def _print_status(mac: str):
         print("  (connect the speaker to read more parameters)")
         return
 
-    # Query multiple values over LWACP in a single connection (safe pacing)
-    values = query_spp_values(mac, [
-        UECommand.EQ_PRESET,
-        UECommand.SONIFICATION,
-        UECommand.VOLUME_ADJUST,
-    ])
+    # Query EQ preset over LWACP (safe to read)
+    values = query_spp_values(mac, [UECommand.EQ_PRESET])
 
     eq_val = values.get(UECommand.EQ_PRESET)
     if eq_val is not None:
         print(f"  EQ Preset:  {_EQ_NAMES.get(eq_val, f'Unknown ({eq_val})')}")
-
-    alert_val = values.get(UECommand.SONIFICATION)
-    if alert_val is not None:
-        print(f"  Alerts:     {_ALERT_NAMES.get(alert_val, f'Unknown ({alert_val})')}")
-
-    vol_val = values.get(UECommand.VOLUME_ADJUST)
-    if vol_val is not None:
-        print(f"  Volume:     {vol_val}")
 
 
 def _stereo_setup_flow(mac: str):
@@ -69,7 +56,7 @@ def _stereo_setup_flow(mac: str):
 
         print()
         print("Step 1: Initiating stereo discovery on the connected speaker...")
-        if not send_spp_command(mac, COMMANDS["mode_stereo"], verbose=False):
+        if not send_spp_command(mac, COMMANDS["stereo_discover"], verbose=False):
             print("ERROR: Failed to send stereo command. Is the speaker connected?")
             return
         stereo_sent = True
@@ -82,27 +69,20 @@ def _stereo_setup_flow(mac: str):
         print("  3. Wait for it to start blinking fast")
         print("  4. Wait for both speakers to stop blinking (lights go solid)")
         print()
+        print("  Note: If both lights turn off instead of going solid,")
+        print("  the pairing timed out. Re-run --stereo-setup and try again.")
+        print()
         input("Press Enter when both speakers have solid lights...")
         print()
-        print("Step 3: Assigning stereo roles...")
-        role_input = input(
-            "Which channel is the CONNECTED speaker? [L]eft / (r)ight: "
-        ).strip().lower()
-        if role_input in ("r", "right"):
-            role_name = "right"
-        elif role_input in ("", "l", "left"):
-            role_name = "left"
-        else:
-            print(f"Unrecognized input '{role_input}', defaulting to left.")
-            role_name = "left"
-
+        print("Step 3: Assigning connected speaker as LEFT channel...")
         time.sleep(1.0)
-        if not send_spp_command(mac, COMMANDS[f"role_{role_name}"], verbose=False):
+        if not send_spp_command(mac, COMMANDS["role_left"], verbose=False):
             print("ERROR: Failed to assign stereo role.")
             return
 
-        print(f"Assigned connected speaker to: {role_name}")
-        print("Stereo setup complete! Use '--mode stereo' or '--mode double' to switch modes.")
+        print("Stereo setup complete! Connected speaker is LEFT, second speaker is RIGHT.")
+        print("Use '--mode stereo' or '--mode double' to switch modes.")
+        print("Use '--stereo right' to swap channels if needed.")
 
     except (KeyboardInterrupt, EOFError):
         print("\nSetup cancelled.")
@@ -125,16 +105,12 @@ Examples:
   # Check battery (auto-detects speaker if only one paired)
   %(prog)s --battery
 
-  # Set EQ to "Out Loud" (bass boost)
-  %(prog)s --mac 88:C6:26:XX:XX:XX --eq outloud
-
   # Guided stereo pairing setup
-  %(prog)s --mac 88:C6:26:XX:XX:XX --stereo-setup
+  %(prog)s --stereo-setup
 
   # Interactive mode
-  %(prog)s --mac 88:C6:26:XX:XX:XX --interactive
+  %(prog)s -i
 
-EQ presets: outloud, intimate, vocals, off
 Stereo roles: left, right
 Modes: stereo, double
         """,
@@ -144,11 +120,6 @@ Modes: stereo, double
     parser.add_argument("--list", action="store_true", help="List paired UE speakers")
     parser.add_argument("--status", action="store_true", help="Show current speaker status")
     parser.add_argument("--battery", action="store_true", help="Read battery level")
-    parser.add_argument(
-        "--eq",
-        choices=["outloud", "intimate", "vocals", "off"],
-        help="Set EQ preset",
-    )
     parser.add_argument(
         "--stereo",
         choices=["left", "right"],
@@ -160,9 +131,6 @@ Modes: stereo, double
         help="Guided stereo pairing setup for two speakers",
     )
     parser.add_argument("--mode", choices=["stereo", "double"], help="Set Double Up mode")
-    parser.add_argument("--alerts", choices=["on", "off"], help="Toggle alert sounds")
-    parser.add_argument("--ble", choices=["on", "off"], help="Toggle BLE state")
-    parser.add_argument("--volume", choices=["up", "down"], help="Adjust volume")
     parser.add_argument("--name", help="Set speaker name")
     parser.add_argument("--interactive", "-i", action="store_true", help="Interactive menu mode")
     parser.add_argument("--raw", help="Send raw hex command (e.g. '03 01 64 01')")
@@ -214,10 +182,7 @@ Modes: stereo, double
         return
 
     # --- SPP commands ---
-    if args.eq:
-        send_spp_command(mac, COMMANDS[f"eq_{args.eq}"])
-
-    elif args.stereo_setup:
+    if args.stereo_setup:
         _stereo_setup_flow(mac)
 
     elif args.stereo:
@@ -229,15 +194,6 @@ Modes: stereo, double
 
     elif args.mode:
         send_spp_command(mac, COMMANDS[f"mode_{args.mode}"])
-
-    elif args.alerts:
-        send_spp_command(mac, COMMANDS[f"alerts_{args.alerts}"])
-
-    elif args.ble:
-        send_spp_command(mac, COMMANDS[f"ble_{args.ble}"])
-
-    elif args.volume:
-        send_spp_command(mac, COMMANDS[f"volume_{args.volume}"])
 
     elif args.name:
         set_speaker_name(mac, args.name)

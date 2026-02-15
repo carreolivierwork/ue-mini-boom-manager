@@ -67,22 +67,13 @@ class TestUECommandConstants:
 
 class TestCommandsDict:
     def test_completeness(self):
-        """COMMANDS dict has all 18 expected keys."""
+        """COMMANDS dict has all 9 expected keys."""
         expected_keys = {
             "battery_announce",
-            "volume_up",
-            "volume_down",
-            "alerts_off",
-            "alerts_on",
             "sound_power_on",
-            "ble_off",
-            "ble_on",
-            "eq_off",
-            "eq_outloud",
-            "eq_intimate",
-            "eq_vocals",
             "mode_double",
             "mode_stereo",
+            "stereo_discover",
             "role_left",
             "role_right",
             "doubleup_lock_off",
@@ -94,20 +85,11 @@ class TestCommandsDict:
         for key, value in COMMANDS.items():
             assert isinstance(value, bytes), f"COMMANDS['{key}'] is not bytes"
 
-    def test_eq_outloud_value(self):
-        assert COMMANDS["eq_outloud"] == build_spp_command(0x64, 0x01)
-
-    def test_eq_intimate_value(self):
-        assert COMMANDS["eq_intimate"] == build_spp_command(0x64, 0x02)
-
     def test_role_left_value(self):
         assert COMMANDS["role_left"] == build_spp_command(0x68, 0x00)
 
     def test_role_right_value(self):
         assert COMMANDS["role_right"] == build_spp_command(0x68, 0x01)
-
-    def test_volume_up_value(self):
-        assert COMMANDS["volume_up"] == build_spp_command(0xBB, 0x01, 0x01)
 
     def test_battery_announce_value(self):
         assert COMMANDS["battery_announce"] == build_spp_command(0x6B)

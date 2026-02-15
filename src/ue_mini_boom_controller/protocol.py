@@ -97,25 +97,13 @@ def build_spp_command(command_id: int, *params: int) -> bytes:
 COMMANDS = {
     # Battery
     "battery_announce": build_spp_command(UECommand.BATTERY_ANNOUNCE),
-    # Volume
-    "volume_up": build_spp_command(UECommand.VOLUME_ADJUST, 0x01, 0x01),
-    "volume_down": build_spp_command(UECommand.VOLUME_ADJUST, 0x00, 0x01),
-    # Alert sounds
-    "alerts_off": build_spp_command(UECommand.SONIFICATION, 0x00),
-    "alerts_on": build_spp_command(UECommand.SONIFICATION, 0x01),
     # Sound effects
     "sound_power_on": build_spp_command(UECommand.EMIT_SOUND, 0x60, 0xC0),
-    # BLE toggle
-    "ble_off": build_spp_command(UECommand.BLE_STATE, 0x00),
-    "ble_on": build_spp_command(UECommand.BLE_STATE, 0x01),
-    # EQ presets
-    "eq_off": build_spp_command(UECommand.EQ_PRESET, 0x00),
-    "eq_outloud": build_spp_command(UECommand.EQ_PRESET, 0x01),
-    "eq_intimate": build_spp_command(UECommand.EQ_PRESET, 0x02),
-    "eq_vocals": build_spp_command(UECommand.EQ_PRESET, 0x03),
     # Double Up modes
     "mode_double": build_spp_command(UECommand.DOUBLE_UP_MODE, 0x00),
     "mode_stereo": build_spp_command(UECommand.DOUBLE_UP_MODE, 0x01),
+    # Stereo discovery trigger (querying DU lock initiates pairing workflow)
+    "stereo_discover": build_spp_command(UECommand.DOUBLE_UP_LOCK),
     # Stereo role assignment
     "role_left": build_spp_command(UECommand.DOUBLE_UP_ROLE, 0x00),
     "role_right": build_spp_command(UECommand.DOUBLE_UP_ROLE, 0x01),
