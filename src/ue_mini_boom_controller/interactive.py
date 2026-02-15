@@ -12,31 +12,16 @@ def interactive_mode(mac_address: str):
 ║         Speaker: {mac_address}       ║
 ╚══════════════════════════════════════════════════╝
 
-=== Stereo / Double Up ===
-  1) Set mode: Stereo (L/R channels)
-  2) Set mode: Double (same audio)
-  3) Set this speaker as LEFT channel
-  4) Set this speaker as RIGHT channel
-  5) Double Up auto-reconnect: ON
-  6) Double Up auto-reconnect: OFF
-
-=== Other ===
-  7) Announce battery level (audible)
-  8) Set speaker name
-  9) Play power-on sound
+  1) Announce battery level (audible)
+  2) Set speaker name
+  3) Play power-on sound
 
   0) Quit
 """)
 
     command_map = {
-        "1": "mode_stereo",
-        "2": "mode_double",
-        "3": "role_left",
-        "4": "role_right",
-        "5": "doubleup_lock_on",
-        "6": "doubleup_lock_off",
-        "7": "battery_announce",
-        "9": "sound_power_on",
+        "1": "battery_announce",
+        "3": "sound_power_on",
     }
 
     while True:
@@ -49,7 +34,7 @@ def interactive_mode(mac_address: str):
         if choice == "0":
             print("Goodbye!")
             break
-        elif choice == "8":
+        elif choice == "2":
             name = input("Enter new speaker name: ").strip()
             if name:
                 set_speaker_name(mac_address, name)

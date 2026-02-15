@@ -81,8 +81,6 @@ def _stereo_setup_flow(mac: str):
             return
 
         print("Stereo setup complete! Connected speaker is LEFT, second speaker is RIGHT.")
-        print("Use '--mode stereo' or '--mode double' to switch modes.")
-        print("Use '--stereo right' to swap channels if needed.")
 
     except (KeyboardInterrupt, EOFError):
         print("\nSetup cancelled.")
@@ -110,9 +108,6 @@ Examples:
 
   # Interactive mode
   %(prog)s -i
-
-Stereo roles: left, right
-Modes: stereo, double
         """,
     )
 
@@ -121,16 +116,10 @@ Modes: stereo, double
     parser.add_argument("--status", action="store_true", help="Show current speaker status")
     parser.add_argument("--battery", action="store_true", help="Read battery level")
     parser.add_argument(
-        "--stereo",
-        choices=["left", "right"],
-        help="Set stereo mode and assign L/R role",
-    )
-    parser.add_argument(
         "--stereo-setup",
         action="store_true",
         help="Guided stereo pairing setup for two speakers",
     )
-    parser.add_argument("--mode", choices=["stereo", "double"], help="Set Double Up mode")
     parser.add_argument("--name", help="Set speaker name")
     parser.add_argument("--interactive", "-i", action="store_true", help="Interactive menu mode")
     parser.add_argument("--raw", help="Send raw hex command (e.g. '03 01 64 01')")
@@ -184,16 +173,6 @@ Modes: stereo, double
     # --- SPP commands ---
     if args.stereo_setup:
         _stereo_setup_flow(mac)
-
-    elif args.stereo:
-        print("Setting stereo mode...")
-        send_spp_command(mac, COMMANDS["mode_stereo"])
-        time.sleep(0.5)
-        print(f"Setting role: {args.stereo}...")
-        send_spp_command(mac, COMMANDS[f"role_{args.stereo}"])
-
-    elif args.mode:
-        send_spp_command(mac, COMMANDS[f"mode_{args.mode}"])
 
     elif args.name:
         set_speaker_name(mac, args.name)

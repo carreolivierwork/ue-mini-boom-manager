@@ -20,7 +20,7 @@ class TestCLIHelp:
         assert "--mac" in captured.out
         assert "--list" in captured.out
         assert "--battery" in captured.out
-        assert "--stereo" in captured.out
+        assert "--stereo-setup" in captured.out
         assert "--interactive" in captured.out
         assert "--raw" in captured.out
 

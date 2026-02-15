@@ -67,17 +67,13 @@ class TestUECommandConstants:
 
 class TestCommandsDict:
     def test_completeness(self):
-        """COMMANDS dict has all 9 expected keys."""
+        """COMMANDS dict has all 5 expected keys."""
         expected_keys = {
             "battery_announce",
             "sound_power_on",
-            "mode_double",
-            "mode_stereo",
             "stereo_discover",
             "role_left",
             "role_right",
-            "doubleup_lock_off",
-            "doubleup_lock_on",
         }
         assert set(COMMANDS.keys()) == expected_keys
 
