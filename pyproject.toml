@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ue-mini-boom-controller"
+version = "1.0.0"
+description = "UE Mini Boom Controller — replaces the official app using direct Bluetooth communication"
+requires-python = ">=3.13"
+license = "GPL-3.0-or-later"
+authors = [{ name = "Olivier" }]
+readme = "README_UE_MINI_BOOM.md"
+dependencies = [
+    "argcomplete",
+]
+
+[project.optional-dependencies]
+spp = [
+    "pybluez",
+]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "ruff",
+    "build",
+]
+
+[project.scripts]
+ueboom = "ue_mini_boom_controller.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
